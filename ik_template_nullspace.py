@@ -120,6 +120,7 @@ if __name__ == "__main__":
         handles.append(env.plot3(points=array(target), pointsize=15.0, colors=array((0,0,1)) )) 
         epson = 0.01
         alpha = 0.001
+        beta  = 0.001
         activedof_n = len(jointnames)
 
         # array([-5.64601796e-01, -3.53600216e-01, -6.50000756e-01, -2.12130808e+00, -1.00000000e+04, -2.00000770e+00, -1.00000000e+04]),
