@@ -83,6 +83,7 @@ def view_pc(pcs, fig=None, color='b', marker='o'):
     ax.set_zlabel('Z')
     ax.hold()
     # Update the figure
+    # ax.set_aspect('equal', adjustable='box')
     plt.show()
 
     # Return a handle to the figure so the user can make adjustments
