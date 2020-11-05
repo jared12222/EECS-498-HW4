@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
         ### YOUR CODE HERE ###
         
-        target = targets[4] ###pick your target here
+        target = targets[0] ###pick your target here
         #draw the target point in blue
         handles.append(env.plot3(points=array(target), pointsize=15.0, colors=array((0,0,1)) )) 
         epson = 0.01
@@ -139,6 +139,7 @@ if __name__ == "__main__":
         q_path = [q]
 
         qnow = q.T
+        dq = zeros((activedof_n,1))
         # Iterative IK
         while True:
             xnow = mat(GetEETransform(robot,list(qnow))[0:3,3]).T
@@ -148,8 +149,19 @@ if __name__ == "__main__":
                 break
             J = GetTranslationJacobian(robot,jointnames)
             Jinv = GetJpinv(J)
-            q_dot = matmul(Jinv,x_dot)
-            q_dot = alpha * q_dot / norm2(q_dot)
+            
+            for i in range(activedof_n):
+                if joint_circular[i] == True:
+                    dq[i] = 0
+                if abs(qnow[i]-doflimits[1][i]) > abs(qnow[i]-doflimits[0][i]):
+                    dq[i] = qnow[i]-doflimits[0][i]
+                else:
+                    dq[i] = doflimits[1][i]-qnow[i]
+
+            
+            q_dot = matmul(Jinv,x_dot) + beta * matmul(( identity( activedof_n ) - matmul(Jinv,J) ), dq)
+
+            q_dot = alpha * q_dot / norm2(q_dot) # normalized with step
             qnow = qnow + q_dot
             for n in range(activedof_n):
                 if qnow[n,0] >= doflimits[1][n]:
