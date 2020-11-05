@@ -74,7 +74,7 @@ def main():
     no = numpy.matrix(vh[reduced_dim,:])
     no = numpy.reshape(no,(3,1))
 
-    utils.draw_plane(fig,no,mu)
+    utils.draw_plane(fig,no,mu,color=[0,1,0,0.3])
 
     ###YOUR CODE HERE###
 
