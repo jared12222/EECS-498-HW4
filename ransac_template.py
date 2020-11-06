@@ -16,8 +16,8 @@ def main():
     utils.view_pc([pc])
 
     #Fit a plane to the data using ransac
-    iteration = 500
-    N = 120
+    iteration = 1000
+    N = 150
     epson = 0.07
 
     N_to_fit = 3
