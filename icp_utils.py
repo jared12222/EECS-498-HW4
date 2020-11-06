@@ -18,21 +18,43 @@ def findclosest(P,Q):
     return P_pair,Q_pair
 
 def mean(pts):
-    return np.mean(pts,axis=0)
+    sum = np.matrix("0;0;0")
+    for pt in pts:
+        sum = sum + pt
+    return sum/len(pts)
 
-def GetTransform(Cp,Cq):
+def weight_mean(Cp,Cq):
+    w = []
+    dist = []
+    sum = 0
+    for p,q in zip(Cp,Cq):
+        dist.append(euclidean(p,q))
+        sum = sum + dist[-1]
+    avg = sum/len(Cp)
+
+    for d in dist:
+        w.append(abs(d-avg))
+    w = np.array(w)/np.max(w)
     
+    return np.sum(Cp,axis = 0)/np.sum(w), np.sum(Cq,axis=0)/np.sum(w), w
+
+def GetTransform(Cp,Cq, weighted = True):
     
-    p_mean = mean(Cp)
-    q_mean = mean(Cq)
+    if weighted:
+        p_mean, q_mean , w = weight_mean(Cp,Cq)
+    else:
+        p_mean = mean(Cp)
+        q_mean = mean(Cq)
+
 
     X = np.matrix(np.reshape(np.array(Cp).T,(3,len(Cp))))
     Y = np.matrix(np.reshape(np.array(Cq).T,(3,len(Cq))))
-    # print X[:,0]
     X = X-p_mean
     Y = Y-q_mean
-    # print X[:,0]
-    S = np.matmul(X,Y.T)
+    if weighted:
+        S = np.matmul(np.matmul(X,np.diag(w)),Y.T)
+    else:
+        S = np.matmul(X,Y.T)
     u,s,vT = np.linalg.svd(S)
     m = np.diag([1,1,np.linalg.det(np.matmul(vT.T,u.T))])
     R = np.matmul(np.matmul(vT.T,m),u.T)
