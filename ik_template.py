@@ -108,38 +108,39 @@ if __name__ == "__main__":
            [-1.11050811,  0.97000718,  1.31087581]]
     doflimits = robot.GetActiveDOFLimits() #make sure q doesn't go past these limits
     q = numpy.zeros((1,robot.GetActiveDOF())) #start at this configuration
-    with env:
-        start = time.clock()
-        handles = [] #graphics handles for plotting
-        SetActiveDOFValuesNPMatrix(robot,q)
-
-        ### YOUR CODE HERE ###
         
-        target = targets[4] ###pick your target here
-        #draw the target point in blue
-        handles.append(env.plot3(points=array(target), pointsize=15.0, colors=array((0,0,1)) )) 
-        epson = 0.01
-        alpha = 0.001
-        activedof_n = len(jointnames)
+    start = time.clock()
+    handles = [] #graphics handles for plotting
+    SetActiveDOFValuesNPMatrix(robot,q)
 
-        # array([-5.64601796e-01, -3.53600216e-01, -6.50000756e-01, -2.12130808e+00, -1.00000000e+04, -2.00000770e+00, -1.00000000e+04]),
-        # array([ 2.13539289e+00,  1.29629967e+00,  3.74999698e+00, -1.50000054e-01,  1.00000000e+04, -1.00000036e-01,  1.00000000e+04]))
+    ### YOUR CODE HERE ###
         
-        joint_circular = []
-        for n,name in zip(range(len(jointnames)),jointnames):
-            isCircular = False
-            for i in range(3):
-                isCircular = isCircular or robot.GetJoint(name).IsCircular(i)
-            if isCircular:
-                doflimits[0][n] = -pi
-                doflimits[1][n] = pi
-            joint_circular.append(isCircular)
-        
-        q_path = [q]
+    target = targets[4] ###pick your target here
+    #draw the target point in blue
+    handles.append(env.plot3(points=array(target), pointsize=15.0, colors=array((0,0,1)) )) 
+    epson = 0.01
+    alpha = 0.001
+    activedof_n = len(jointnames)
 
-        qnow = q.T
-        # Iterative IK
-        while True:
+    # array([-5.64601796e-01, -3.53600216e-01, -6.50000756e-01, -2.12130808e+00, -1.00000000e+04, -2.00000770e+00, -1.00000000e+04]),
+    # array([ 2.13539289e+00,  1.29629967e+00,  3.74999698e+00, -1.50000054e-01,  1.00000000e+04, -1.00000036e-01,  1.00000000e+04]))
+      
+    joint_circular = []
+    for n,name in zip(range(len(jointnames)),jointnames):
+        isCircular = False
+        for i in range(3):
+            isCircular = isCircular or robot.GetJoint(name).IsCircular(i)
+        if isCircular:
+            doflimits[0][n] = -pi
+            doflimits[1][n] = pi
+        joint_circular.append(isCircular)
+        
+    q_path = [q]
+
+    qnow = q.T
+    # Iterative IK
+    while True:
+        with env:
             xnow = mat(GetEETransform(robot,list(qnow))[0:3,3]).T
             x_dot = mat(target).T-xnow
             error = norm2(x_dot)
@@ -149,19 +150,20 @@ if __name__ == "__main__":
             Jinv = GetJpinv(J)
             q_dot = matmul(Jinv,x_dot)
             q_dot = alpha * q_dot / norm2(q_dot)
-            qnow = qnow + q_dot
-            for n in range(activedof_n):
-                if qnow[n,0] >= doflimits[1][n]:
-                    if joint_circular[n] == True:
-                        qnow[n,0] = qnow[n,0]-doflimits[1][n]+doflimits[0][n]
-                    else:
-                        qnow[n,0] = doflimits[1][n]
-                elif qnow[n,0] <= doflimits[0][n]:
-                    if joint_circular[n] == True:
-                        qnow[n,0] = qnow[n,0]-doflimits[0][n]+doflimits[1][n]
-                    else:
-                        qnow[n,0] = doflimits[0][n]
-            q_path.append(qnow)
+        qnow = qnow + q_dot
+        robot.SetActiveDOFValues(qnow)
+        for n in range(activedof_n):
+            if qnow[n,0] >= doflimits[1][n]:
+                if joint_circular[n] == True:
+                    qnow[n,0] = qnow[n,0]-doflimits[1][n]+doflimits[0][n]
+                else:
+                    qnow[n,0] = doflimits[1][n]
+            elif qnow[n,0] <= doflimits[0][n]:
+                if joint_circular[n] == True:
+                    qnow[n,0] = qnow[n,0]-doflimits[0][n]+doflimits[1][n]
+                else:
+                    qnow[n,0] = doflimits[0][n]
+        q_path.append(qnow)
 
         ### YOUR CODE HERE ###
 
