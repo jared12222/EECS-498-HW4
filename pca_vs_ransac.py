@@ -27,7 +27,7 @@ def main():
     n_outlier_pca = []
     n_outlier_ransac = []
     epson = .05
-
+    num_outliers = 0
     for i in range(0,num_tests):
         pc = add_some_outliers(pc,10) #adding 10 new outliers for each test
         # fig = utils.view_pc([pc])
@@ -40,7 +40,7 @@ def main():
         time_pca.append(end-start)
         
         start = time.clock()
-        ransac_model = ransac(pc,iteration = 400,lower_bound=100,N_to_fit = 3, epson = epson)
+        ransac_model = ransac(pc,iteration = 500,lower_bound=100,N_to_fit = 3, epson = epson)
         end   = time.clock()
         time_ransac.append(end-start)
 
@@ -49,21 +49,18 @@ def main():
         
         sum_pca = 0
         sum_ransac = 0
-        num_pca = 0
-        num_ransac = 0
         for pt in pc:
             error = error_plane(pt,pca_model)
             if error < epson:
                 sum_pca = sum_pca + error
-                num_pca = num_pca + 1
             error = error_plane(pt,ransac_model)
             if error < epson:
                 sum_ransac = sum_ransac + error
-                num_ransac = num_ransac + 1
+        num_outliers = num_outliers + 10
         e_pca.append(float(sum_pca))
         e_ransac.append(float(sum_ransac))
-        n_outlier_pca.append(len(pc)-num_pca)
-        n_outlier_ransac.append(len(pc)-num_ransac)
+        n_outlier_pca.append(num_outliers)
+        n_outlier_ransac.append(num_outliers)
         # raw_input("Press enter to continue")
     
     inlier  = []
@@ -92,11 +89,11 @@ def main():
     
     fig3 = matplotlib.pyplot.figure()
     ax = fig3.add_subplot(111)
-    ax.scatter(e_pca,n_outlier_pca,label="PCA")
-    ax.scatter(e_ransac,n_outlier_ransac,label="RANSAC")
+    ax.plot(n_outlier_pca, e_pca,label="PCA")
+    ax.plot(n_outlier_ransac, e_ransac,label="RANSAC")
     ax.legend()
-    ax.set_xlabel('Error')
-    ax.set_ylabel('Numter of Outliers')
+    ax.set_ylabel('Error')
+    ax.set_xlabel('Numter of Outliers')
     matplotlib.pyplot.show()
 
     fig4 = matplotlib.pyplot.figure()
@@ -115,13 +112,13 @@ def main():
     ax.legend()
     matplotlib.pyplot.show()
     
-    choice = raw_input("Save figures?(y/n)\n")
-    if choice == "y":
-        fig1.savefig("PCAvsRAN_PCA_Fitting.png")
-        fig2.savefig("PCAvsRAN_RAN_Fitting.png")
-        fig3.savefig("PCAvsRAN_Error_Outlier.png")
-        fig4.savefig("PCAvsRAN_PCA_ComputationTime.png")
-        fig5.savefig("PCAvsRAN_RAN_ComputationTime.png")
+    # choice = raw_input("Save figures?(y/n)\n")
+    # if choice == "y":
+    #     fig1.savefig("PCAvsRAN_PCA_Fitting.png")
+    #     fig2.savefig("PCAvsRAN_RAN_Fitting.png")
+    #     fig3.savefig("PCAvsRAN_Error_Outlier.png")
+    #     fig4.savefig("PCAvsRAN_PCA_ComputationTime.png")
+    #     fig5.savefig("PCAvsRAN_RAN_ComputationTime.png")
 
     raw_input("Press enter to end:")
 
