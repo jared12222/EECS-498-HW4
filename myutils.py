@@ -67,7 +67,6 @@ def ransac(pts,iteration=200,lower_bound=100,N_to_fit = 3,epson=0.07):
             error_new = 0
             for j in range(len(pt_pick)):
                 error_new = error_new + error_plane(pt_pick[j],[plane_org, plane_normal])
-            error_new = error_new/len(pt_pick)
             if error_new < error_best:
                 error_best = error_new
                 model = [plane_org, plane_normal]

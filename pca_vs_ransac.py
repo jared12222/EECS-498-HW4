@@ -40,7 +40,7 @@ def main():
         time_pca.append(end-start)
         
         start = time.clock()
-        ransac_model = ransac(pc,iteration = 250,lower_bound=100,N_to_fit = 3, epson = epson)
+        ransac_model = ransac(pc,iteration = 400,lower_bound=100,N_to_fit = 3, epson = epson)
         end   = time.clock()
         time_ransac.append(end-start)
 
@@ -60,8 +60,8 @@ def main():
             if error < epson:
                 sum_ransac = sum_ransac + error
                 num_ransac = num_ransac + 1
-        e_pca.append(float(sum_pca)/num_pca)
-        e_ransac.append(float(sum_pca)/num_ransac)
+        e_pca.append(float(sum_pca))
+        e_ransac.append(float(sum_ransac))
         n_outlier_pca.append(len(pc)-num_pca)
         n_outlier_ransac.append(len(pc)-num_ransac)
         # raw_input("Press enter to continue")
@@ -115,14 +115,13 @@ def main():
     ax.legend()
     matplotlib.pyplot.show()
     
-    # choice = raw_input("Save figures?(y/n)\n")
-    # print choice == "y"
-    # if choice == "y":
-    #     fig1.savefig("PCAvsRAN_PCA_Fitting.png")
-    #     fig2.savefig("PCAvsRAN_RAN_Fitting.png")
-    #     fig3.savefig("PCAvsRAN_Error_Outlier.png")
-    #     fig4.savefig("PCAvsRAN_PCA_ComputationTime.png")
-    #     fig5.savefig("PCAvsRAN_RAN_ComputationTime.png")
+    choice = raw_input("Save figures?(y/n)\n")
+    if choice == "y":
+        fig1.savefig("PCAvsRAN_PCA_Fitting.png")
+        fig2.savefig("PCAvsRAN_RAN_Fitting.png")
+        fig3.savefig("PCAvsRAN_Error_Outlier.png")
+        fig4.savefig("PCAvsRAN_PCA_ComputationTime.png")
+        fig5.savefig("PCAvsRAN_RAN_ComputationTime.png")
 
     raw_input("Press enter to end:")
 

@@ -61,7 +61,7 @@ def main():
             error_new = 0
             for j in range(len(pts)):
                 error_new = error_new + error_plane(pts[j],[plane_org, plane_normal])
-            error_new = error_new/len(pts)
+            error_new = error_new
             if error_new < error_best:
                 error_best = error_new
                 model = [plane_org, plane_normal]
